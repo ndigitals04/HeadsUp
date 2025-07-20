@@ -8,7 +8,7 @@ export const metadata: Metadata = {
   title: 'HeadsUp',
   description: 'Where Fortune Favors the Bold',
 }
-
+// 
 export default function RootLayout({
   children,
 }: Readonly<{

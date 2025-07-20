@@ -76,7 +76,6 @@ export function Header({
     chain = chainMap[chainId]
 
     ;
-
   useEffect(() => {
     setChainID(chainId)
     setSelectedNetwork(chain?.name)
@@ -95,7 +94,7 @@ export function Header({
                 <span className="opacity-75 text-xs text-gray-300 p-1 bg-gold-dark/30 rounded-sm">MVP</span>
               </div>
             </div>
-
+            {/*  */}
             {/* Comments Toggle Button */}
             <Button
               onClick={() => setIsCommentsSidebarOpen(true)}

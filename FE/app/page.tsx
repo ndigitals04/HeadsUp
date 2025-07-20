@@ -43,7 +43,7 @@ export default function Home() {
           isWalletConnected={isWalletConnected}
           walletAddress={walletAddress}
         />
-
+        {/*  */}
         <div className="relative z-10 flex flex-col h-full">
           {/* Header - Fixed height */}
           <div className="flex-shrink-0">
