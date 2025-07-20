@@ -1,0 +1,9 @@
+{
+  "proxyAddress": "0xC469e7aE4aD962c30c7111dc580B4adbc7E914DD",
+  "implementationAddress": "0x73511669fd4dE447feD18BB79bAFeAC93aB7F31f",
+  "network": "localhost",
+  "deployedAt": "2025-07-20T17:14:14.693Z",
+  "deployer": "0x8626f6940E2eb28930eFb4CeF49B2d1F2C9C1199",
+  "previousImplementation": "0x73511669fd4dE447feD18BB79bAFeAC93aB7F31f",
+  "upgradedAt": "2025-07-20T17:19:09.288Z"
+}

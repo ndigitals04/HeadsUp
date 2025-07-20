@@ -1,0 +1,44 @@
+{
+  "name": "headsup-smart-contract",
+  "version": "1.0.0",
+  "description": "HeadsUp coin flip smart contract with Chainlink VRF",
+  "main": "index.js",
+  "scripts": {
+    "compile": "hardhat compile",
+    "test": "hardhat test",
+    "test:gas": "REPORT_GAS=true hardhat test",
+    "coverage": "hardhat coverage",
+    "node": "hardhat node",
+    "deploy:localhost": "hardhat run scripts/deploy.ts --network localhost",
+    "deploy:hardhat": "hardhat run scripts/deploy.ts --network hardhat",
+    "deploy:alfajores": "hardhat run scripts/deploy.ts --network alfajores",
+    "deploy:celo": "hardhat run scripts/deploy.ts --network celo",
+    "upgrade:localhost": "hardhat run scripts/upgrade.ts --network localhost",
+    "upgrade:alfajores": "hardhat run scripts/upgrade.ts --network alfajores",
+    "upgrade:celo": "hardhat run scripts/upgrade.ts --network celo",
+    "interact:localhost": "hardhat run scripts/interact.ts --network localhost",
+    "interact:alfajores": "hardhat run scripts/interact.ts --network alfajores",
+    "interact:celo": "hardhat run scripts/interact.ts --network celo",
+    "verify:alfajores": "hardhat verify --network alfajores",
+    "verify:celo": "hardhat verify --network celo"
+  },
+  "devDependencies": {
+    "@nomicfoundation/hardhat-toolbox": "^6.1.0",
+    "@openzeppelin/contracts": "^5.0.0",
+    "@openzeppelin/contracts-upgradeable": "^5.0.0",
+    "@openzeppelin/hardhat-upgrades": "^3.9.0",
+    "@chainlink/contracts": "^1.2.0",
+    "@types/node": "^20.0.0",
+    "@types/chai": "^4.3.0",
+    "@types/mocha": "^10.0.0",
+    "chai": "^4.3.0",
+    "mocha": "^10.0.0",
+    "typescript": "^5.0.0",
+    "hardhat": "^2.26.0",
+    "hardhat-gas-reporter": "^1.0.9",
+    "solidity-coverage": "^0.8.5"
+  },
+  "dependencies": {
+    "dotenv": "^16.5.0"
+  }
+}
