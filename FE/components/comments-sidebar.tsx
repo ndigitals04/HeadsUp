@@ -201,17 +201,17 @@ export function CommentsSidebar({ isOpen, setIsOpen, isWalletConnected, walletAd
         />
       )}
 
-      {/* Sidebar */}
+      {/* Sidebar - Responsive width */}
       <div
-        className={`fixed left-0 top-0 h-full w-80 bg-card/95 backdrop-blur-sm border-r border-gold z-50 transform transition-transform duration-300 ease-in-out ${
+        className={`fixed left-0 top-0 h-full w-full sm:w-96 md:w-80 bg-card/95 backdrop-blur-sm border-r border-gold z-50 transform transition-transform duration-300 ease-in-out ${
           isOpen ? "translate-x-0" : "-translate-x-full"
         }`}
       >
         {/* Header */}
-        <div className="flex items-center justify-between p-4 border-b border-gold">
+        <div className="flex items-center justify-between p-3 sm:p-4 border-b border-gold">
           <div className="flex items-center space-x-2">
-            <MessageCircle className="w-5 h-5 text-gold" />
-            <h2 className="text-lg font-semibold text-gold">Community Chat</h2>
+            <MessageCircle className="w-4 h-4 sm:w-5 sm:h-5 text-gold" />
+            <h2 className="text-base sm:text-lg font-semibold text-gold">Community Chat</h2>
             <Badge variant="outline" className="border-green-500/30 text-green-500 text-xs">
               {comments.length}
             </Badge>
@@ -220,7 +220,7 @@ export function CommentsSidebar({ isOpen, setIsOpen, isWalletConnected, walletAd
             variant="ghost"
             size="sm"
             onClick={() => setIsOpen(false)}
-            className="text-muted-foreground hover:text-foreground"
+            className="text-muted-foreground hover:text-foreground p-1"
           >
             <X className="w-4 h-4" />
           </Button>
@@ -229,15 +229,15 @@ export function CommentsSidebar({ isOpen, setIsOpen, isWalletConnected, walletAd
         {/* Content */}
         <div className="flex flex-col h-full">
           {/* Add Comment */}
-          <div className="p-4 border-b border-gold/10">
-            <div className="space-y-3">
+          <div className="p-3 sm:p-4 border-b border-gold/10">
+            <div className="space-y-2 sm:space-y-3">
               <Textarea
                 placeholder={isWalletConnected ? "Share your thoughts..." : "Connect your wallet to comment"}
                 value={newComment}
                 onChange={(e) => setNewComment(e.target.value)}
                 disabled={!isWalletConnected}
                 className="bg-muted/50 border-gold text-foreground placeholder-muted-foreground resize-none text-sm"
-                rows={3}
+                rows={2}
               />
               <div className="flex justify-between items-center">
                 <span className="text-xs text-muted-foreground">
@@ -247,7 +247,7 @@ export function CommentsSidebar({ isOpen, setIsOpen, isWalletConnected, walletAd
                   onClick={addComment}
                   disabled={!newComment.trim() || !isWalletConnected}
                   size="sm"
-                  className="bg-gold-gradient hover:opacity-90 text-white font-semibold"
+                  className="bg-gold-gradient hover:opacity-90 text-white font-semibold text-xs"
                 >
                   <Send className="w-3 h-3 mr-1" />
                   Post
@@ -257,13 +257,13 @@ export function CommentsSidebar({ isOpen, setIsOpen, isWalletConnected, walletAd
           </div>
 
           {/* Comments List */}
-          <div className="flex-1 overflow-y-auto p-4 space-y-4">
+          <div className="flex-1 overflow-y-auto p-3 sm:p-4 space-y-3 sm:space-y-4">
             {comments.map((comment) => (
-              <div key={comment.id} className="bg-muted/30 rounded-lg p-3 space-y-3 border border-gold/10">
+              <div key={comment.id} className="bg-muted/30 rounded-lg p-2 sm:p-3 space-y-2 sm:space-y-3 border border-gold/10">
                 {/* Comment Header */}
                 <div className="flex items-center justify-between">
                   <div className="flex items-center space-x-2">
-                    <div className="w-6 h-6 bg-gold-gradient rounded-full flex items-center justify-center text-white font-bold text-xs">
+                    <div className="w-5 h-5 sm:w-6 sm:h-6 bg-gold-gradient rounded-full flex items-center justify-center text-white font-bold text-xs">
                       {comment.address.slice(2, 4).toUpperCase()}
                     </div>
                     <div>
@@ -277,7 +277,7 @@ export function CommentsSidebar({ isOpen, setIsOpen, isWalletConnected, walletAd
                 </div>
 
                 {/* Comment Content */}
-                <p className="text-foreground text-sm leading-relaxed">{comment.message}</p>
+                <p className="text-foreground text-sm leading-relaxed break-words">{comment.message}</p>
 
                 {/* Comment Actions */}
                 <div className="flex items-center space-x-3">
@@ -335,7 +335,7 @@ export function CommentsSidebar({ isOpen, setIsOpen, isWalletConnected, walletAd
 
                 {/* Replies */}
                 {comment.replies.length > 0 && (
-                  <div className="ml-4 space-y-2 border-l-2 border-gold/20 pl-3">
+                  <div className="ml-2 sm:ml-4 space-y-2 border-l-2 border-gold/20 pl-2 sm:pl-3">
                     {comment.replies.map((reply) => (
                       <div key={reply.id} className="bg-muted/30 rounded-lg p-2">
                         <div className="flex items-center justify-between mb-1">
@@ -347,7 +347,7 @@ export function CommentsSidebar({ isOpen, setIsOpen, isWalletConnected, walletAd
                             <span className="text-xs text-muted-foreground">{getTimeAgo(reply.timestamp)}</span>
                           </div>
                         </div>
-                        <p className="text-foreground text-xs mb-1">{reply.message}</p>
+                        <p className="text-foreground text-xs mb-1 break-words">{reply.message}</p>
                         <button
                           onClick={() => toggleLike(comment.id, reply.id)}
                           className={`flex items-center space-x-1 text-xs transition-colors ${
