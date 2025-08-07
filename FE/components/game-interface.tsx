@@ -1,4 +1,7 @@
 "use client"
+import { ethers, parseEther } from "ethers";
+import contractAbi from "@/lib/localhost-abi.json" // if your ABI is stored here
+import { BrowserProvider } from "ethers";
 
 import { useState, useCallback, useMemo } from "react"
 import { Button } from "@/components/ui/button"
@@ -48,22 +51,66 @@ export function GameInterface() {
   const currentAssets = assets[chainId] || assets[42220]
   const currentAsset = currentAssets.find(asset => asset.symbol === selectedAsset) || currentAssets[0]
 
-  const flipCoin = useCallback(async () => {
-    if (!selectedSide || !address) return
+  // const flipCoin = useCallback(async () => {
+  //   if (!selectedSide || !address) return
 
-    setIsFlipping(true)
-    setGameResult(null)
+  //   setIsFlipping(true)
+  //   setGameResult(null)
 
-    // Simulate network delay
-    await new Promise(resolve => setTimeout(resolve, 2000))
+  //   // Simulate network delay
+  //   await new Promise(resolve => setTimeout(resolve, 2000))
 
-    const result = Math.random() < 0.5 ? "heads" : "tails"
-    const won = result === selectedSide
-    const payout = won ? betAmount[0] * 1.95 : 0
+  //   const result = Math.random() < 0.5 ? "heads" : "tails"
+  //   const won = result === selectedSide
+  //   const payout = won ? betAmount[0] * 1.95 : 0
 
-    setGameResult({ result, won, payout })
-    setIsFlipping(false)
-  }, [selectedSide, betAmount, address])
+  //   setGameResult({ result, won, payout })
+  //   setIsFlipping(false)
+  // }, [selectedSide, betAmount, address])
+
+
+const contractAddress = "0xYourContractAddress"
+
+const flipCoin = useCallback(async () => {
+  if (!selectedSide || !address || !window.ethereum) return;
+
+  try {
+    setIsFlipping(true);
+    setGameResult(null);
+
+    const provider = new BrowserProvider(window.ethereum);
+    const signer = await provider.getSigner();
+    const contract = new ethers.Contract(contractAddress, contractAbi, signer);
+
+    // Convert the bet amount (string or number) to BigInt (in Wei)
+    const valueInWei = parseEther(betAmount[0].toString());
+
+    // Call the contract flip function with CELO value
+    const tx = await contract.flip(
+      selectedSide === "heads",
+      { value: valueInWei }
+    );
+
+    const receipt = await tx.wait();
+
+    // Check the event emitted
+    const event = receipt.events?.find((e: any) => e.event === "CoinFlipped");
+    const won = event?.args?.won;
+    const result = event?.args?.result ? "heads" : "tails";
+
+    setGameResult({
+      result,
+      won,
+      payout: won ? betAmount[0] * 1.95 : 0,
+    });
+  } catch (err) {
+    console.error("Flip failed:", err);
+  } finally {
+    setIsFlipping(false);
+  }
+}, [selectedSide, betAmount, address]);
+
+
 
   const adjustBetAmount = useCallback((multiplier: number) => {
     setBetAmount([Math.max(0.01, betAmount[0] * multiplier)])
