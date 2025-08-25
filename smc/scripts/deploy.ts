@@ -1,5 +1,5 @@
-import { ethers, upgrades, network } from "hardhat";
-import { HardhatEthersSigner } from "@nomicfoundation/hardhat-ethers/signers";
+import { ethers, upgrades} from "hardhat";
+// import { HardhatEthersSigner } from "@nomicfoundation/hardhat-ethers/signers";
 import fs from "fs";
 import path from "path";
 
@@ -30,7 +30,7 @@ async function getImplementationAddressWithRetry(
 }
 
 async function main(): Promise<void> {
-  const [deployer]: HardhatEthersSigner[] = await ethers.getSigners();
+  const [deployer] = await ethers.getSigners();
   console.log("Deploying contracts with the account:", deployer.address);
 
   // Deploy HeadsUp as upgradeable proxy
