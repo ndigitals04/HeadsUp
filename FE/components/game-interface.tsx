@@ -1,7 +1,7 @@
 "use client"
-import { ethers, parseEther } from "ethers";
 import contractAbi from "@/lib/localhost-abi.json" // if your ABI is stored here
-import { BrowserProvider } from "ethers";
+import { BrowserProvider, Contract, parseEther, formatEther } from "ethers"
+
 
 import { useState, useCallback, useMemo } from "react"
 import { Button } from "@/components/ui/button"
@@ -71,44 +71,88 @@ export function GameInterface() {
 
 const contractAddress = "0xYourContractAddress"
 
+// TODO: put your real deployed addresses here
+const ADDR: Record<number, string> = {
+  44787: "0xF194afDf50B03e69Bd7D057c1Aa9e10c9954E4C9", // Alfajores testnet
+  42220: "0xYourCeloMainnetAddress" // Celo mainnet
+}
+
+function randomUint256(): bigint {
+  const bytes = new Uint8Array(32)
+  crypto.getRandomValues(bytes)
+  const hex = "0x" + Array.from(bytes).map(b => b.toString(16).padStart(2, "0")).join("")
+  return BigInt(hex)
+}
+
 const flipCoin = useCallback(async () => {
-  if (!selectedSide || !address || !window.ethereum) return;
+  if (!selectedSide || !address || !window.ethereum) return
 
   try {
-    setIsFlipping(true);
-    setGameResult(null);
+    setIsFlipping(true)
+    setGameResult(null)
 
-    const provider = new BrowserProvider(window.ethereum);
-    const signer = await provider.getSigner();
-    const contract = new ethers.Contract(contractAddress, contractAbi, signer);
+    const provider = new BrowserProvider(window.ethereum)
+    const signer = await provider.getSigner()
+    const network = await provider.getNetwork()
+    const chainId = Number(network.chainId)
 
-    // Convert the bet amount (string or number) to BigInt (in Wei)
-    const valueInWei = parseEther(betAmount[0].toString());
+    const contractAddress = ADDR[chainId]
+    if (!contractAddress || !/^0x[a-fA-F0-9]{40}$/.test(contractAddress)) {
+      throw new Error(`Contract address not set for chainId ${chainId}. Update ADDR mapping.`)
+    }
 
-    // Call the contract flip function with CELO value
-    const tx = await contract.flip(
-      selectedSide === "heads",
-      { value: valueInWei }
-    );
+    const contract = new Contract(contractAddress, contractAbi, signer)
 
-    const receipt = await tx.wait();
+    // Only CELO is supported by the contract right now
+    // (UI shows cUSD/cEUR, but the contract only accepts native CELO via msg.value)
+    const valueInWei = parseEther(betAmount[0].toString())
 
-    // Check the event emitted
-    const event = receipt.events?.find((e: any) => e.event === "CoinFlipped");
-    const won = event?.args?.won;
-    const result = event?.args?.result ? "heads" : "tails";
+    // Optional: enforce min/max bet from contract to avoid reverts
+    const [minBet, maxBet] = await contract.getBetLimits()
+    if (valueInWei < minBet || valueInWei > maxBet) {
+      const min = Number(formatEther(minBet))
+      const max = Number(formatEther(maxBet))
+      throw new Error(`Bet must be between ${min} and ${max} CELO`)
+    }
+
+    const choiceNum = selectedSide === "heads" ? 1 : 0
+    const rnd = randomUint256()
+
+    // Call the payable function exactly as defined in the ABI
+    const tx = await contract.flipCoin(choiceNum, rnd, { value: valueInWei })
+    const receipt = await tx.wait()
+
+    // Parse logs to find GameResult(requestId, player, amount, playerChoice, result, won, payout, randomNumber, timestamp)
+    let won = false
+    let resultSide: "heads" | "tails" = "tails"
+    let payout = 0
+
+    for (const log of receipt.logs) {
+      try {
+        const parsed = contract.interface.parseLog(log)
+        if (parsed.name === "GameResult") {
+          won = Boolean(parsed.args.won)
+          const resultNum = Number(parsed.args.result) // 0 or 1
+          resultSide = resultNum === 1 ? "heads" : "tails"
+          payout = Number(formatEther(parsed.args.payout))
+          break
+        }
+      } catch { /* not our event */ }
+    }
 
     setGameResult({
-      result,
+      result: resultSide,
       won,
-      payout: won ? betAmount[0] * 1.95 : 0,
-    });
-  } catch (err) {
-    console.error("Flip failed:", err);
+      payout: won ? payout : 0,
+    })
+  } catch (err: any) {
+    console.error("Flip failed:", err)
+    alert(err?.message ?? String(err))
   } finally {
-    setIsFlipping(false);
+    setIsFlipping(false)
   }
-}, [selectedSide, betAmount, address]);
+}, [selectedSide, betAmount, address])
+
 
 
 
